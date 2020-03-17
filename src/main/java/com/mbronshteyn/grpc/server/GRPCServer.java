@@ -1,15 +1,20 @@
-package com.mbronshteyn.grpc.greeting.server;
+package com.mbronshteyn.grpc.server;
 
+import com.mbronshteyn.grpc.greeting.service.GreetServiceImpl;
+import com.mbronshteyn.grpc.sum.service.SumServiceImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 
 import java.io.IOException;
 
-public class GreetingServer {
+public class GRPCServer {
     public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Hello gRPC");
 
-        Server server = ServerBuilder.forPort(50051).build();
+        Server server = ServerBuilder.forPort(50051)
+                .addService(new GreetServiceImpl())
+                .addService(new SumServiceImpl())
+                .build();
 
         server.start();
 

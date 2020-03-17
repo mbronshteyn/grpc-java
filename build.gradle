@@ -50,3 +50,4 @@ idea {
         generatedSourceDirs += file('build/generated/source')
     }
 }
+
