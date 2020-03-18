@@ -1,5 +1,7 @@
 package com.mbronshteyn.grpc.greeting.service;
 
+import com.proto.greet.GreetManyTimesRequest;
+import com.proto.greet.GreetManyTimesResponse;
 import com.proto.greet.GreetRequest;
 import com.proto.greet.GreetResponse;
 import com.proto.greet.GreetServiceGrpc;
@@ -17,9 +19,30 @@ public class GreetServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
                 .setResult(result)
                 .build();
 
-        responseObserver
-                .onNext(greetResponse);
+        responseObserver.onNext(greetResponse);
 
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public void greetManyTimes(GreetManyTimesRequest request, StreamObserver<GreetManyTimesResponse> responseObserver) {
+        Greeting greeting = request.getGreeting();
+        String firstName = greeting.getFirstName();
+
+        try {
+            for (int i = 0; i < 10; i++) {
+                String result = "Hello, " + firstName + "; response number: " + i;
+                GreetManyTimesResponse greetResponse = GreetManyTimesResponse.newBuilder()
+                        .setResult(result)
+                        .build();
+                responseObserver.onNext(greetResponse);
+                Thread.sleep(1000L);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            responseObserver.onCompleted();
+        }
+
     }
 }

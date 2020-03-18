@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package calculator;
+
+option java_package = "com.proto.calculator";
+option java_multiple_files = true;
+
+// Sum
+message Sum {
+    int32 first_integer = 1;
+    int32 second_integer = 2;
+}
+
+message SumRequest {
+    Sum sum = 1;
+}
+
+message SumResponse {
+    int32 result = 1;
+}
+
+// Prime Number
+message PrimeNumber {
+    int32 number = 1;
+}
+
+message PrimeNumberRequest {
+    PrimeNumber primeNumber = 1;
+}
+
+message PrimeNumberResponse {
+    int32 result = 1;
+}
+
+service CalculatorService {
+    // Unary
+    rpc Sum (SumRequest) returns (SumResponse) {
+    };
+
+    // Client Stream
+    rpc PrimeNumber (PrimeNumberRequest) returns (stream PrimeNumberResponse) {
+    };
+}
