@@ -35,11 +35,11 @@ message UnaryNoticeResponse {
 }
 
 enum ChannelType {
-  UNSPECIFIED = 0;
-  EMAIL = 1;
-  SMS = 2;
-  SLACK = 3;
-  PAGER_DUTY = 4;
+  CHANNEL_TYPE_UNSPECIFIED = 0;
+  CHANNEL_TYPE_EMAIL = 1;
+  CHANNEL_TYPE_SMS = 2;
+  CHANNEL_TYPE_SLACK = 3;
+  CHANNEL_TYPE_PAGER_DUTY = 4;
 }
 
 message Notice {

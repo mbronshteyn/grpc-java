@@ -4,48 +4,23 @@ package logrhythm.common.v1;
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
 import "logrhythm/common/v1/notifications.proto";
 
 option java_multiple_files = true;
 option java_package = "com.logrhythm.core.api.v1.grpc";
 
-/*
-service __serviceClass__Service {
-  rpc CreateEntityClass (__entityClass__) returns (Unary__entityClass__Response) {
-  }
-  rpc GetEntityClass (logrhythm.common.v1.Identifier) returns (Unary__entityClass__Response) {
-  }
-  rpc ReplaceEntityClass (__entityClass__) returns (Unary__entityClass__Response) {
-  }
-  rpc DeleteEntityClass (logrhythm.common.v1.Identifier) returns (google.protobuf.Empty)  {
-  }
-  rpc FindEntityClassByAgeRange (__entityClass__ByAgeRangeRequest) returns (SeekPage__entityClass__Response)  {
-  }
-
-  rpc FindEntityClassByNamePattern (__entityClass__ByNamePatternRequest) returns (SeekPage__entityClass__Response)  {
-  }
-}
-
-*/
-
-
 service NotificationConfigService {
-    rpc CreateConfig (NotificationConfig) returns (UnaryConfigResponse) {}
-    rpc ReplaceConfig (NotificationConfig) returns (UnaryConfigResponse) {}
-    rpc GetConfig (NotificationConfig) returns (UnaryConfigResponse) {}
-    rpc DeleteConfig (DeleteConfigRequest) returns (UnaryDeleteConfigResponse) {}
+    rpc CreateConfig (NotificationConfig) returns (UnaryNotificationConfigResponse) {}
+    rpc ReplaceConfig (NotificationConfig) returns (UnaryNotificationConfigResponse) {}
+    rpc GetConfig (logrhythm.common.v1.Identifier) returns (UnaryNotificationConfigResponse) {}
+    rpc DeleteConfig (logrhythm.common.v1.Identifier) returns (google.protobuf.Empty) {}
+    rpc FindNotificationConfig (NotificationConfigPatternRequest) returns (SeekPageNotificationConfigResponse) {}
 }
 
-message UnaryConfigResponse {
-    NotificationConfig config = 1;
-}
-
-message DeleteConfigRequest {
-    string config_id = 1;
-}
-
-message UnaryDeleteConfigResponse {
-    // ???
+message UnaryNotificationConfigResponse {
+    logrhythm.common.v1.UnaryResponseHeader info = 1;
+    NotificationConfig config = 2;
 }
 
 message NotificationConfig {
@@ -53,20 +28,35 @@ message NotificationConfig {
     string tenant_id = 2;
     string service_name = 3;
     string category = 4;
-
     string subcategory = 5;
-    string user_id = 6;
-    string channel = 7;
-    string destination = 8;
+    int32 risk_based_score = 6;
+    string role = 7;
+    string entity = 8;
+    string channel = 9;
+    string destination = 10;
 }
 
+message NotificationConfigPatternRequest {
+    string tenant_id = 1;
+    string service_name = 2;
+    string category = 3;
+    string subcategory = 4;
+    string role = 5;
+    string entity = 6;
+    string channel = 7;
+}
+
+message SeekPageNotificationConfigResponse {
+    logrhythm.common.v1.SeekPageResponseHeader info = 1;
+    repeated NotificationConfig content = 2;
+}
 
 // maybe these go in another proto3 service def'n
 service ChannelConfigService {
     rpc CreateChannelConfig (ChannelConfig) returns (UnaryChannelConfigResponse) {}
     rpc UpdateChannelConfig (ChannelConfig) returns (UnaryChannelConfigResponse) {}
     rpc DeleteChannelConfig (ChannelConfig) returns (google.protobuf.Empty) {}
-    rpc ListChannelConfigs (logrhythm.common.v1.Identifier) returns (ListChannelConfigsResponse) {}
+    rpc ListChannelConfigs (logrhythm.common.v1.Identifier) returns (SeekPageChannelConfigResponse) {}
     rpc ListChannelTypes (logrhythm.common.v1.Identifier) returns (ListChannelTypesResponse) {}
 }
 
@@ -75,8 +65,8 @@ message UnaryChannelConfigResponse {
     ChannelConfig channel_config = 2;
 }
 
-message ListChannelConfigsResponse {
-    logrhythm.common.v1.UnaryResponseHeader info = 1;
+message SeekPageChannelConfigResponse {
+    logrhythm.common.v1.SeekPageResponseHeader info = 1;
     repeated ChannelConfig channel_configs = 2;
 }
 
@@ -86,7 +76,7 @@ message ListChannelTypesResponse {
 }
 
 message ChannelConfig {
-    logrhythm.common.v1.Identifier id = 1;
+    string tenant_id = 1;
     ChannelType channel_type = 2;
     oneof config_properties {
         EmailChannelConfig email_channel_config = 3;
@@ -96,9 +86,9 @@ message ChannelConfig {
     }
 
     message EmailChannelConfig {
+        // subject to update/change
         string smtp_server = 1;
         int32 port = 2;
-
         // also include authentication details
 
     }
@@ -116,13 +106,112 @@ message ChannelConfig {
     }
 
     message SlackChannelConfig {
-        string slack_channel = 1;
-
-        // todo
+        // subject to update/change
+        string channel_name = 1;
+        string webhook = 2;
     }
 
     message PagerDutyChannelConfig {
-        // ???
+        // tbd
     }
+}
 
+service UserPreferenceService {
+    rpc CreateUserPreference (UserPreference) returns (UnaryUserPreferenceResponse) {}
+    rpc ReplaceUserPreference (UserPreference) returns (UnaryUserPreferenceResponse) {}
+    rpc UpdateUserPreference (UpdateUserPreferenceRequest) returns (UnaryUserPreferenceResponse) {}
+    rpc GetUserPreference (logrhythm.common.v1.Identifier) returns (UnaryUserPreferenceResponse) {}
+    rpc DeleteUserPreference (logrhythm.common.v1.Identifier) returns (google.protobuf.Empty) {}
+}
+
+
+message UnaryUserPreferenceResponse {
+    logrhythm.common.v1.UnaryResponseHeader info = 1;
+    UserPreference user_preference = 2;
+}
+
+message UpdateUserPreferenceRequest {
+    UserPreference user_preference = 1;
+    google.protobuf.FieldMask update_mask = 2;
+}
+
+message UserPreference {
+    logrhythm.common.v1.Identifier user_id = 1;
+    string name = 2;
+    string email_address = 3;
+    string slack_channel = 4;
+    repeated MuteSpecifier mute_specifiers = 5;
+}
+
+message MuteSpecifier {
+    bool mute = 1;
+    google.protobuf.Timestamp mute_until = 2;
+    string channel = 3;
+    RiskBasedPriority risk_based_priority = 4;
+}
+
+service NotificationTemplateService {
+    rpc CreateNotificationTemplate (NotificationTemplate) returns (UnaryNotificationTemplateResponse) {}
+    rpc ReplaceNotificationTemplate (NotificationTemplate) returns (UnaryNotificationTemplateResponse) {}
+    rpc GetNotificationTemplate (logrhythm.common.v1.Identifier) returns (UnaryNotificationTemplateResponse) {}
+    rpc FindNotificationTemplate (NotificationTemplatePatternRequest) returns (SeekPageNotificationTemplateResponse) {}
+    rpc DeleteNotificationTemplate (logrhythm.common.v1.Identifier) returns (google.protobuf.Empty) {}
+}
+
+message UnaryNotificationTemplateResponse {
+    logrhythm.common.v1.UnaryResponseHeader info = 1;
+    NotificationTemplate notification_template = 2;
+}
+
+message NotificationTemplatePatternRequest {
+    string tenant_id = 1;
+    string channel = 2;
+    RiskBasedPriority risk_based_priority = 3;
+    string service_name = 4;
+    logrhythm.common.v1.SeekPageRequest pageRequest = 10;
+}
+
+message SeekPageNotificationTemplateResponse {
+    logrhythm.common.v1.SeekPageResponseHeader info = 1;
+    repeated NotificationTemplate content = 2;
+}
+
+message NotificationTemplate {
+    string template_id = 1;
+    string tenant_id = 2;
+    string channel = 3;
+    RiskBasedPriority risk_based_priority = 4;
+    string service_name = 5;
+    string template = 10;
+}
+
+enum RiskBasedPriority {
+    RISK_BASED_PRIORITY_UNSPECIFIED = 0;
+    RISK_BASED_PRIORITY_LOW = 1;
+    RISK_BASED_PRIORITY_MEDIUM = 2;
+    RISK_BASED_PRIORITY_HIGH = 3;
+}
+
+
+
+// Represents a request to a resource that is sent when the seek pagination method should be used
+// to partition the result set.
+message SeekPageRequest {
+    int32 limit = 1;
+    string afterId = 2;
+
+    // Optional. Fields that should be used to sort the responses. Cannot be changed after the
+    // initial request. Defaults to the "id" column. The "id" column will also be used in addition to
+    // any other specified sort fields.
+    // NOTE: currently, only one sort field is supported.
+//    Sort sort = 3;
+}
+
+message SeekPageResponseHeader {
+    string requestId = 1;
+    SeekPaginationInfo paginationInfo = 2;
+}
+
+message SeekPaginationInfo {
+    string nextPage = 1;
 }
