@@ -4,6 +4,7 @@ package logrhythm.common.v1;
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
+import "google/api/http
 
 option java_multiple_files = true;
 option java_package = "com.logrhythm.core.api.v1.grpc";
@@ -25,7 +26,12 @@ message UnaryResponseHeader {
 }
 
 service NotificationService {
-    rpc CreateNotice (Notice) returns (UnaryNoticeResponse) {}
+    rpc CreateNotice (Notice) returns (UnaryNoticeResponse) {
+        option (google.api.http) = {
+      post: "/v1/echo"
+      body: "*"
+    };
+    }
     rpc GetNotice (logrhythm.common.v1.Identifier) returns (UnaryNoticeResponse) {}
 }
 
@@ -49,17 +55,17 @@ message Notice {
     string subcategory = 3;
     string service_name = 4;
 
+    int32 risk_based_priority = 5;
 
     // if one or more Audience are present, overrides category/subcategory routing.
-    Audience audience = 5;
+    Audience audience = 6;
 
-    ChannelType channel = 6; // optional
+    ChannelType channel = 7; // optional
 
-    NoticeStatus notice_status = 7; // omitted for CreateNotice
-
+    NoticeStatus notice_status = 8; // omitted for CreateNotice
 
     // notification payload (template values)
-    map<string,string> properties = 8;
+    map<string,string> template_properties = 9;
 }
 
 message NoticeStatus {
@@ -88,7 +94,7 @@ message Notification {
     string channel = 3;
     string destination = 4;
     string status_message = 5;
-    map<string,string> properties = 6;
+    map<string,string> template_properties = 6;
 
 }
 

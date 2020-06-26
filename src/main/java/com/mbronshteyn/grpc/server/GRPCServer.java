@@ -1,6 +1,7 @@
 package com.mbronshteyn.grpc.server;
 
 import com.mbronshteyn.grpc.greeting.service.GreetServiceImpl;
+import com.mbronshteyn.grpc.notifications.service.NotificationServiceImpl;
 import com.mbronshteyn.grpc.sum.service.CalculatorServiceImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -14,6 +15,7 @@ public class GRPCServer {
         Server server = ServerBuilder.forPort(50051)
                 .addService(new GreetServiceImpl())
                 .addService(new CalculatorServiceImpl())
+                .addService(new NotificationServiceImpl())
                 .build();
 
         server.start();
