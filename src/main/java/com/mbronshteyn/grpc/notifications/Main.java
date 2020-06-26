@@ -3,10 +3,30 @@ package com.mbronshteyn.grpc.notifications;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
-import com.logrhythm.core.api.v1.grpc.*;
-import org.graalvm.compiler.graph.spi.Canonicalizable;
+import com.logrhythm.core.api.v1.grpc.Audience;
+import com.logrhythm.core.api.v1.grpc.ChannelConfig;
+import com.logrhythm.core.api.v1.grpc.ChannelType;
+import com.logrhythm.core.api.v1.grpc.EmailAudience;
+import com.logrhythm.core.api.v1.grpc.Identifier;
+import com.logrhythm.core.api.v1.grpc.ListChannelTypesResponse;
+import com.logrhythm.core.api.v1.grpc.MuteSpecifier;
+import com.logrhythm.core.api.v1.grpc.Notice;
+import com.logrhythm.core.api.v1.grpc.NoticeStatus;
+import com.logrhythm.core.api.v1.grpc.Notification;
+import com.logrhythm.core.api.v1.grpc.NotificationConfig;
+import com.logrhythm.core.api.v1.grpc.NotificationTemplate;
+import com.logrhythm.core.api.v1.grpc.NotificationTemplatePatternRequest;
+import com.logrhythm.core.api.v1.grpc.RiskBasedPriority;
+import com.logrhythm.core.api.v1.grpc.SeekPageChannelConfigResponse;
+import com.logrhythm.core.api.v1.grpc.SeekPageNotificationConfigResponse;
+import com.logrhythm.core.api.v1.grpc.SeekPageNotificationTemplateResponse;
+import com.logrhythm.core.api.v1.grpc.SeekPageResponseHeader;
+import com.logrhythm.core.api.v1.grpc.SeekPaginationInfo;
+import com.logrhythm.core.api.v1.grpc.UnaryChannelConfigResponse;
+import com.logrhythm.core.api.v1.grpc.UnaryNotificationConfigResponse;
+import com.logrhythm.core.api.v1.grpc.UnaryResponseHeader;
+import com.logrhythm.core.api.v1.grpc.UserPreference;
 
-import java.io.PrintStream;
 import java.util.UUID;
 
 public class Main {
@@ -41,9 +61,9 @@ public class Main {
                                 .setProcessingState(Notification.ProcessingState.SENT)
                                 .setChannel("email")
                                 .setDestination("foo@example.com")))
-                .putProperties("template-key-1", "value1")
-                .putProperties("template-key-2", "value2")
-                .putProperties("template-key-3", "value3")
+                .putTemplateProperties("template-key-1", "value1")
+                .putTemplateProperties("template-key-2", "value2")
+                .putTemplateProperties("template-key-3", "value3")
                 .build();
 
         println("Here's a notice, as if returned from the GetNotice API:");
