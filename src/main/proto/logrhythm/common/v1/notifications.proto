@@ -4,7 +4,6 @@ package logrhythm.common.v1;
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
-import "google/api/http
 
 option java_multiple_files = true;
 option java_package = "com.logrhythm.core.api.v1.grpc";
@@ -26,12 +25,7 @@ message UnaryResponseHeader {
 }
 
 service NotificationService {
-    rpc CreateNotice (Notice) returns (UnaryNoticeResponse) {
-        option (google.api.http) = {
-      post: "/v1/echo"
-      body: "*"
-    };
-    }
+    rpc CreateNotice (Notice) returns (UnaryNoticeResponse) {}
     rpc GetNotice (logrhythm.common.v1.Identifier) returns (UnaryNoticeResponse) {}
 }
 
